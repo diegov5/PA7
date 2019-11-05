@@ -1,3 +1,13 @@
+/*
+ * This program creates a note taking application that allows you to create new notes, edit them, and delete them
+ *
+ * CPSC 312-01, Fall 2019
+ * Programming Assignment #6
+ *
+ * @author Diego Valdez and Patrick Seminatore
+ * @version v1.0 10/22/19
+ */
+
 package com.example.pa6;
 
 import androidx.appcompat.app.AlertDialog;
@@ -23,6 +33,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<Note> myNotes = new ArrayList<>();
     ArrayAdapter<Note> arrayAdapter;
 
+    /*
+     *   This method handles creating the root grid layout, and calling the methods necessary
+     *      for creating the rest of the widgets on the page
+     *
+     *   Parameters: savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             createListView(null);
     }
 
+    /*
+     *   This method handles creating the button that sends you to the activity to create a new note
+     *
+     */
     public void createNewNoteButton(){
         newNoteButton = new Button(this);
         newNoteButton.setText(R.string.newNoteText);
@@ -58,6 +78,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layout.addView(newNoteButton);
     }
 
+    /*
+     *   This method handles creating the list view of the note list view, and giving them the proper
+     *      functionality for on click and on long clicks
+     *
+     *   Parameters: savedInstanceState
+     */
     public void createListView(Note newNote){
         listOfNotes = new ListView(this);
         GridLayout.Spec rowSpec = GridLayout.spec(1, 1, 1);
@@ -134,12 +160,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /*
+     *   This method handles the functionality for creating a new note
+     *
+     *   Parameters: view
+     */
     @Override
     public void onClick(View view) {
         Intent intent = new Intent(this, NoteActivity.class);
         startActivityForResult(intent, 1);
     }
 
+    /*
+     *   This method handles creating the root grid layout, and calling the methods necessary
+     *      for creating the rest of the widgets on the page
+     *
+     *   Parameters: request code: the identifier we send to see if we achieved the needed result
+     *               result code: the identifier we receive to see if we achieved the needed result
+     *               date: the intent that we send in to the new activity we are starting for a result
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {

@@ -1,3 +1,13 @@
+/*
+ * This program creates a note taking application that allows you to create new notes, edit them, and delete them
+ *
+ * CPSC 312-01, Fall 2019
+ * Programming Assignment #6
+ *
+ * @author Diego Valdez and Patrick Seminatore
+ * @version v1.0 10/22/19
+ */
+
 package com.example.pa6;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +24,8 @@ import android.widget.GridLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.util.Objects;
+
 public class NoteActivity extends AppCompatActivity implements View.OnClickListener {
     Spinner categorySpinner;
     EditText title;
@@ -21,6 +33,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     GridLayout noteGridLayout;
     Button doneButton;
 
+    /*
+     *   This method handles creating the root grid layout, and calling the methods necessary
+     *      for creating the rest of the widgets on the page
+     *
+     *   Parameters: savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +52,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = getIntent();
         if (intent.getExtras() != null) {
             createEditText(intent.getStringExtra("noteTitle"));
-            createSpinner(intent.getStringExtra("noteCategory"));
+            createSpinner(Objects.requireNonNull(intent.getStringExtra("noteCategory")));
             createContentEditText(intent.getStringExtra("noteContent"));
         } else {
             createEditText("");
@@ -44,6 +62,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         createDoneButton();
     }
 
+    /*
+     *   This method handles creating the edit text that the user uses for the title
+     *
+     *   Parameters: existingText: null if the note is new, pre populated with old content if note already existed
+     */
     public void createEditText(String existingText){
         title = new EditText(this);
 
@@ -60,6 +83,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         noteGridLayout.addView(title);
     }
 
+    /*
+     *   This method handles creating the edit text that the user uses for the note category
+     *
+     *   Parameters: existingChoice: null if the note is new, pre populated with old choice if note already existed
+     */
     public void createSpinner(String existingChoice){
         categorySpinner = new Spinner(this);
 
@@ -73,7 +101,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         String[] arraySpinner = new String[] {
                 "Personal", "School", "Work", "Other"
         };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, arraySpinner);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(adapter);
@@ -90,6 +118,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         noteGridLayout.addView(categorySpinner);
     }
 
+    /*
+     *   This method handles creating the edit text that the user uses for the note content
+     *
+     *   Parameters: existingText: null if the note is new, pre populated with old content if note already existed
+     */
     public void createContentEditText(String existingText){
         content = new EditText(this);
 
@@ -108,6 +141,10 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    /*
+     *   This method handles creating the button that will save the newly created or edited note
+     *
+     */
     public void createDoneButton(){
         doneButton = new Button(this);
 
@@ -125,6 +162,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         noteGridLayout.addView(doneButton);
     }
 
+    /*
+     *   This method handles the functionality for saving a note
+     *
+     *   Parameters: view
+     */
     @Override
     public void onClick(View view) {
         String finalTitle = title.getText().toString();
