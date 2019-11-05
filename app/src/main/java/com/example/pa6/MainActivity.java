@@ -4,7 +4,8 @@
  * CPSC 312-01, Fall 2019
  * Programming Assignment #6
  *
- * @author Diego Valdez and Patrick Seminatore
+ * @authors Diego Valdez:       Handled the Note object and most of the integration of the MVC data model for the entire app
+ *          Patrick Seminatore: Did most of the work with setting up the layout through java without XML
  * @version v1.0 10/22/19
  */
 
