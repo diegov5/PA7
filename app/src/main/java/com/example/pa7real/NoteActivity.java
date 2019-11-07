@@ -9,7 +9,7 @@
  * @version v1.0 10/22/19
  */
 
-package com.example.pa6;
+package com.example.pa7real;
 
 import androidx.appcompat.app.AppCompatActivity;
 

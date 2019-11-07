@@ -1,4 +1,4 @@
-package com.example.pa6;
+package com.example.pa7real;
 
 import android.content.Context;
 

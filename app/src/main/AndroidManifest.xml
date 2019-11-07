@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.pa6">
+    package="com.example.pa7real">
 
     <application
         android:allowBackup="true"
@@ -9,8 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NoteActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.example.pa7real.NoteActivity"></activity>
+        <activity android:name="com.example.pa7real.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
