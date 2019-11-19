@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = openHelper.getSelectAllNotesCursor();
         cursorAdapter = new SimpleCursorAdapter(
                 this,
-                android.R.layout.activity_list_item,
+                R.layout.personal_activity_layout_file,
                 cursor,
                 // parallel arrays... names of columns to get data FROM
                 new String[] {NoteOpenHelper.TITLE, NoteOpenHelper.IMAGE_REP},
