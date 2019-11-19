@@ -6,33 +6,47 @@
  *
  * @authors Diego Valdez:       Handled the Note object and most of the integration of the MVC data model for the entire app
  *          Patrick Seminatore: Did most of the work with setting up the layout through java without XML
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/mynamepong" title="mynamepong">mynamepong</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * @version v1.0 10/22/19
  */
 
 package com.example.pa7real;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
     Button newNoteButton;
     GridLayout layout;
     ListView listOfNotes;
-    List<Note> myNotes = new ArrayList<>();
-    ArrayAdapter<Note> arrayAdapter;
+    // ArrayAdapter<Note> cursorAdapter;
+    SimpleCursorAdapter cursorAdapter;
 
     /*
      *   This method handles creating the root grid layout, and calling the methods necessary
@@ -49,20 +63,72 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layout.setColumnCount(1);
         layout.setRowCount(2);
 
-        createNewNoteButton();
+        // createNewNoteButton();
+        final NoteOpenHelper openHelper = new NoteOpenHelper(this);
 
         Intent intent = getIntent();
-        if (intent.getStringExtra("noteTitle") != null){
-            Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), intent.getStringExtra("noteCategory"));
-            createListView(newNote);
-        } else
-            createListView(null);
+        //if (intent.getStringExtra("noteTitle") != null){
+        //    Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), intent.getStringExtra("noteCategory"));
+        //    createListView(newNote);
+        //} else
+        //    createListView(null);
+
+        // enable multiple selection on list view
+        listOfNotes.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        // set the listener for entering CAM (contextual action mode)
+        // user long presses they can select multiple items
+        listOfNotes.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+                int numChecked = listOfNotes.getCheckedItemCount();
+                actionMode.setTitle(numChecked + " selected");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                MenuInflater menuInflater = getMenuInflater();
+                menuInflater.inflate(R.menu.cam_menu, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                switch(menuItem.getItemId()){
+                    case R.id.deleteMenuItem:
+                        // Calls getSelectedIds method from ListViewAdapter Class
+                        SparseBooleanArray selected = listOfNotes.getCheckedItemPositions();
+                        // Captures all selected ids with a loop
+                        for (int i = (selected.size() - 1); i >= 0; i--) {
+                            if (selected.valueAt(i)) {
+                                //Note selecteditem = selected.
+                                // Remove selected items following the ids
+                                //openHelper.delete(selecteditem.getId());
+                            }
+                        }
+                        Cursor cursor = openHelper.getSelectAllNotesCursor();
+                        cursorAdapter.swapCursor(cursor);
+                        actionMode.finish();
+                        return true;
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+        });
     }
 
     /*
      *   This method handles creating the button that sends you to the activity to create a new note
      *
-     */
+     *
     public void createNewNoteButton(){
         newNoteButton = new Button(this);
         newNoteButton.setText(R.string.newNoteText);
@@ -77,6 +143,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newNoteButton.setLayoutParams(layoutParams);
         newNoteButton.setOnClickListener(this);
         layout.addView(newNoteButton);
+    }
+    */
+    // inflate the menu in main_menu.xml
+    // override a method to do this
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    // override a callback that executes when the user presses a menu action
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+
+        switch (id) {
+            case R.id.addMenuItem:
+                onClick();
+                return true; // we consumed/handled the event
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     /*
@@ -95,13 +186,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
         listOfNotes.setLayoutParams(layoutParams);
+        NoteOpenHelper openHelper = new NoteOpenHelper(this);
 
-        arrayAdapter  = new ArrayAdapter<>(
-                this, // reference to the current activity
-                android.R.layout.simple_list_item_1, // layout for each row in the list view (item in the data source)
-                myNotes // data source
+        Cursor cursor = openHelper.getSelectAllNotesCursor();
+        cursorAdapter = new SimpleCursorAdapter(
+                this,
+                android.R.layout.activity_list_item,
+                cursor,
+                // parallel arrays... names of columns to get data FROM
+                new String[] {NoteOpenHelper.TITLE, NoteOpenHelper.IMAGE_REP},
+                // ids of textviews to put the data IN
+                new int[] {android.R.id.text1, android.R.id.icon},
+                0 // leave default
         );
-
+        /*
         listOfNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> adapterView, View view, int i, long l) {
@@ -114,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 myNotes.remove(position);
-                                arrayAdapter.notifyDataSetChanged();
+                                cursorAdapter.notifyDataSetChanged();
                             }
                         })
                         .setNegativeButton("No", null)
@@ -137,9 +235,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (newNote != null)
             myNotes.add(newNote);
+        */
 
-
-        listOfNotes.setAdapter(arrayAdapter);
+        listOfNotes.setAdapter(cursorAdapter);
         layout.addView(listOfNotes);
 
         listOfNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -153,9 +251,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 intent.putExtra("noteTitle", noteTitle);
                 intent.putExtra("noteCategory", noteCategory);
                 intent.putExtra("noteContent", noteContent);
-                arrayAdapter.notifyDataSetChanged();
+                cursorAdapter.notifyDataSetChanged();
                 startActivityForResult(intent, 1);
-                myNotes.remove(i);
+                // myNotes.remove(i);
             }
         });
 
@@ -166,8 +264,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      *
      *   Parameters: view
      */
-    @Override
-    public void onClick(View view) {
+    public void onClick() {
         Intent intent = new Intent(this, NoteActivity.class);
         startActivityForResult(intent, 1);
     }
@@ -187,9 +284,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // check if the request code is same as what is passed  here it is 2
         if(requestCode==1)
         {
+            NoteOpenHelper openHelper = new NoteOpenHelper(this);
             Note newNote = new Note(data.getStringExtra("noteTitle"), data.getStringExtra("noteContent"), data.getStringExtra("noteCategory"));
-            myNotes.add(newNote);
-            arrayAdapter.notifyDataSetChanged();
+            openHelper.insertContact(newNote);
+            Cursor cursor = openHelper.getSelectAllNotesCursor();
+            cursorAdapter.swapCursor(cursor);
         }
     }
 }
