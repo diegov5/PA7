@@ -67,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
         final NoteOpenHelper openHelper = new NoteOpenHelper(this);
 
         Intent intent = getIntent();
-        //if (intent.getStringExtra("noteTitle") != null){
-        //    Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), intent.getStringExtra("noteCategory"));
-        //    createListView(newNote);
-        //} else
-        //    createListView(null);
+        if (intent.getStringExtra("noteTitle") != null){
+            Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), intent.getStringExtra("noteCategory"));
+            createListView(newNote);
+        } else
+            createListView(null);
 
         // enable multiple selection on list view
         listOfNotes.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -125,29 +125,8 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*
-     *   This method handles creating the button that sends you to the activity to create a new note
-     *
-     *
-    public void createNewNoteButton(){
-        newNoteButton = new Button(this);
-        newNoteButton.setText(R.string.newNoteText);
-
-        GridLayout.Spec rowSpec = GridLayout.spec(0, 1, 1);
-        // row start index, row span, row weight
-        GridLayout.Spec colSpec = GridLayout.spec(0, 1, 1);
-        GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams(rowSpec, colSpec);
-        layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
-        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-
-        newNoteButton.setLayoutParams(layoutParams);
-        newNoteButton.setOnClickListener(this);
-        layout.addView(newNoteButton);
-    }
-    */
     // inflate the menu in main_menu.xml
     // override a method to do this
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -156,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // override a callback that executes when the user presses a menu action
-
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
