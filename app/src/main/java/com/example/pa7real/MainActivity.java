@@ -1,16 +1,17 @@
 /*
- * This program creates a note taking application that allows you to create new notes, edit them, and delete them
+ * This program creates a note taking application that allows you to create new notes, edit them, and delete them, and store them
+ *          in a SQLite database
  *
  * CPSC 312-01, Fall 2019
- * Programming Assignment #6
+ * Programming Assignment #7
  *
- * @authors Diego Valdez:       Handled the Note object and most of the integration of the MVC data model for the entire app
- *          Patrick Seminatore: Did most of the work with setting up the layout through java without XML
+ * @authors Diego Valdez:       Handled the database management, UI work, and custom layouts
+ *          Patrick Seminatore: Worked on the deletion of the notes, manipulating the listview, and editing existing notes
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/mynamepong" title="mynamepong">mynamepong</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
- * @version v1.0 10/22/19
+ * @version v1.0 11/19/19
  */
 
 package com.example.pa7real;
@@ -36,6 +37,7 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "SQLiteFunTag";
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent.getStringExtra("noteTitle") != null){
-            Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), intent.getStringExtra("noteCategory"));
+            Note newNote = new Note(intent.getStringExtra("noteTitle"), intent.getStringExtra("noteContent"), Objects.requireNonNull(intent.getStringExtra("noteCategory")));
             createListView(newNote);
         } else
             createListView(null);
@@ -100,14 +102,13 @@ public class MainActivity extends AppCompatActivity {
                         // Calls getSelectedIds method from ListViewAdapter Class
                         SparseBooleanArray selected = noteListView.getCheckedItemPositions();
                         ArrayList<Note> allNotes = new ArrayList<>(openHelper.getSelectAllNotesList());
-                        Cursor cursor = openHelper.getSelectAllNotesCursor();
                         // Captures all selected ids with a loop
                         int k = 0;
                         for (int j = 0; j <= allNotes.size(); j++) {
                             Log.d(TAG, "valueOfI " + j);
                             if (j == selected.keyAt(k)) {
                                 Log.d(TAG, "selectedNote: " + selected.keyAt(j));
-                                Note selecteditem = (Note) allNotes.get(j);
+                                Note selecteditem = allNotes.get(j);
                                 Log.d(TAG, "valueOfSelectedArray: " + selected.toString());
                                 Log.d(TAG, "beforeAddingNote: " + selecteditem.getTitle());
                                 // Remove selected items following the ids
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                         for (int i = 0; i < selectedNotes.size(); i++){
                             openHelper.delete(selectedNotes.get(i).getId());
                         }
-                        cursor = openHelper.getSelectAllNotesCursor();
+                        Cursor cursor = openHelper.getSelectAllNotesCursor();
                         cursorAdapter.swapCursor(cursor);
                         actionMode.finish();
                         return true;
@@ -173,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
         noteListView.setLayoutParams(layoutParams);
-        NoteOpenHelper openHelper = new NoteOpenHelper(this);
+        final NoteOpenHelper openHelper = new NoteOpenHelper(this);
 
         Cursor cursor = openHelper.getSelectAllNotesCursor();
         cursorAdapter = new SimpleCursorAdapter(
@@ -193,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
         noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Note selectedNote = (Note) adapterView.getItemAtPosition(i);
+                Note selectedNote =  openHelper.getSelectAllNotesList().get(i);
                 String noteTitle = selectedNote.getTitle();
                 String noteCategory = selectedNote.getCategory();
                 String noteContent = selectedNote.getContent();
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("noteContent", noteContent);
                 cursorAdapter.notifyDataSetChanged();
                 startActivityForResult(intent, 1);
-                // myNotes.remove(i);
+                openHelper.delete(selectedNote.getId());
             }
         });
 
@@ -235,7 +236,7 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode==1)
         {
             NoteOpenHelper openHelper = new NoteOpenHelper(this);
-            Note newNote = new Note(data.getStringExtra("noteTitle"), data.getStringExtra("noteContent"), data.getStringExtra("noteCategory"));
+            Note newNote = new Note(data.getStringExtra("noteTitle"), data.getStringExtra("noteContent"), Objects.requireNonNull(data.getStringExtra("noteCategory")));
             openHelper.insertContact(newNote);
             Cursor cursor = openHelper.getSelectAllNotesCursor();
             cursorAdapter.swapCursor(cursor);

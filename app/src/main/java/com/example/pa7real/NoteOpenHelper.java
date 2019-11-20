@@ -1,16 +1,17 @@
 /*
- * This program creates a note taking application that allows you to create new notes, edit them, and delete them
+ * This program creates a note taking application that allows you to create new notes, edit them, and delete them, and store them
+ *          in a SQLite database
  *
  * CPSC 312-01, Fall 2019
- * Programming Assignment #6
+ * Programming Assignment #7
  *
- * @authors Diego Valdez:       Handled the Note object and most of the integration of the MVC data model for the entire app
- *          Patrick Seminatore: Did most of the work with setting up the layout through java without XML
+ * @authors Diego Valdez:       Handled the database management, UI work, and custom layouts
+ *          Patrick Seminatore: Worked on the deletion of the notes, manipulating the listview, and editing existing notes
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
  * <div>Icons made by <a href="https://www.flaticon.com/authors/mynamepong" title="mynamepong">mynamepong</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
- * @version v1.0 10/22/19
+ * @version v1.0 11/19/19
  */
 
 package com.example.pa7real;
@@ -39,7 +40,7 @@ public class NoteOpenHelper extends SQLiteOpenHelper {
     static final String CONTENT = "content";
     static final String IMAGE_REP = "image_id";
 
-    public NoteOpenHelper(Context context) {
+    NoteOpenHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
@@ -121,19 +122,6 @@ public class NoteOpenHelper extends SQLiteOpenHelper {
         }
 
         return noteList;
-    }
-
-    public void updateContactById(int id, Note newNote) {
-        // UPDATE tableContacts SET name='SPIKE', phoneNumber='208-208-2082' WHERE _id=1
-        String sqlUpdate = "UPDATE " + TABLE_NOTES + " SET " +
-                TITLE + "='" + newNote.getTitle() + "', " +
-                SPINNER_CHOICE  + "='" + newNote.getCategory() + "', " +
-                CONTENT + "='" + newNote.getContent() + "' WHERE " +
-                ID + "=" + id;
-        Log.d(TAG, "updateNoteById: " + sqlUpdate);
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL(sqlUpdate);
-        db.close();
     }
 
     public void delete(int id) {

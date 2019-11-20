@@ -1,12 +1,17 @@
 /*
- * This program creates a note taking application that allows you to create new notes, edit them, and delete them
+ * This program creates a note taking application that allows you to create new notes, edit them, and delete them, and store them
+ *          in a SQLite database
  *
  * CPSC 312-01, Fall 2019
- * Programming Assignment #6
+ * Programming Assignment #7
  *
- * @authors Diego Valdez:       Handled the Note object and most of the integration of the MVC data model for the entire app
- *          Patrick Seminatore: Did most of the work with setting up the layout through java without XML
- * @version v1.0 10/22/19
+ * @authors Diego Valdez:       Handled the database management, UI work, and custom layouts
+ *          Patrick Seminatore: Worked on the deletion of the notes, manipulating the listview, and editing existing notes
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * <div>Icons made by <a href="https://www.flaticon.com/authors/mynamepong" title="mynamepong">mynamepong</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+ * @version v1.0 11/19/19
  */
 
 package com.example.pa7real;
