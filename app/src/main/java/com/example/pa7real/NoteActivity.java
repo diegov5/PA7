@@ -11,6 +11,8 @@
 
 package com.example.pa7real;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -22,9 +24,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class NoteActivity extends AppCompatActivity implements View.OnClickListener {
@@ -99,12 +104,57 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         categorySpinner.setLayoutParams(layoutParams);
-        String[] arraySpinner = new String[] {
-                "Personal", "School", "Work", "Other"
+        final DropdownItem[] arraySpinner = new DropdownItem[] {
+                new DropdownItem("Personal", R.drawable.user), new DropdownItem("School", R.drawable.classroom), new DropdownItem("Work", R.drawable.man_desk), new DropdownItem("Other", R.drawable.planning)
         };
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, arraySpinner);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        final ArrayList<DropdownItem> spinnerItems = new ArrayList<DropdownItem>();
+        spinnerItems.add(new DropdownItem("Personal", R.drawable.user));
+        spinnerItems.add(new DropdownItem("School", R.drawable.classroom));
+        spinnerItems.add(new DropdownItem("Work", R.drawable.man_desk));
+        spinnerItems.add(new DropdownItem("Other", R.drawable.planning));
+
+        ArrayAdapter<DropdownItem> adapter = new ArrayAdapter<DropdownItem>(this,
+                R.layout.custom_spinner_dropdown, android.R.id.text1, spinnerItems){
+                // override getView()
+                // getView() returns a view for each item in the data source
+                // to be displayed as a row in the list view
+
+                @NonNull
+                @Override
+                public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                    View view = super.getView(position, convertView, parent);
+                    // inflates simple_list_item_1 for this position contact
+
+                    TextView tv1 = (TextView) view.findViewById(android.R.id.text1);
+
+                    // task: set the name for text1 and set the phone number for text2
+                    ImageView iv1 = (ImageView) view.findViewById(android.R.id.icon);
+
+                    tv1.setText(spinnerItems.get(position).getCategoryName());
+                    iv1.setImageResource(spinnerItems.get(position).getIconID());
+
+                    return view;
+                }
+
+                @NonNull
+                @Override
+                public View getDropDownView (int position, @Nullable View convertView, @NonNull ViewGroup parent){
+                    View view = super.getView(position, convertView, parent);
+                    // inflates simple_list_item_1 for this position contact
+
+                    TextView tv1 = (TextView) view.findViewById(android.R.id.text1);
+
+                    // task: set the name for text1 and set the phone number for text2
+                    ImageView iv1 = (ImageView) view.findViewById(android.R.id.icon);
+
+                    tv1.setText(spinnerItems.get(position).getCategoryName());
+                    iv1.setImageResource(spinnerItems.get(position).getIconID());
+
+                    return view;
+                }
+            };
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         categorySpinner.setAdapter(adapter);
         if(!existingChoice.isEmpty()) {
             if (existingChoice.equals("Personal"))

@@ -5,20 +5,19 @@
     android:paddingTop="1dip"
     android:paddingBottom="1dip"
     android:paddingStart="8dip"
-    android:paddingEnd="8dip"
-    android:choiceMode="multipleChoice"
-    android:background="?android:attr/activatedBackgroundIndicator">
+    android:paddingEnd="8dip">
 
-    <ImageView android:id="@android:id/icon"
-        android:layout_width="70dip"
-        android:layout_height="70dip"/>
+    <ImageView
+        android:id="@android:id/icon"
+        android:layout_width="40dip"
+        android:layout_height="40dip"
+        android:layout_marginRight="5dp"/>
 
     <TextView
         android:id="@android:id/text1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-        android:textColor="#030000"
-        android:textSize="24sp" />
+        android:text="TextView" />
+
 </LinearLayout>

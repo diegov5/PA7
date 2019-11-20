@@ -103,7 +103,7 @@ public class NoteOpenHelper extends SQLiteOpenHelper {
 
     // for debug purposes only!!
     // for PA7 use SimpleCursorAdapter to wire up the database to the listview
-    public List<Note> getSelectAllContactsList() {
+    public List<Note> getSelectAllNotesList() {
         List<Note> noteList = new ArrayList<>();
 
         // goal: walk through each record using a cursor

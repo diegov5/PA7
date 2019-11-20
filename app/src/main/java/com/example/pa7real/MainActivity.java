@@ -16,12 +16,12 @@
 package com.example.pa7real;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import android.content.DialogInterface;
+
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
@@ -31,20 +31,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    Button newNoteButton;
+    static final String TAG = "SQLiteFunTag";
     GridLayout layout;
-    ListView listOfNotes;
+    ListView noteListView;
     // ArrayAdapter<Note> cursorAdapter;
     SimpleCursorAdapter cursorAdapter;
 
@@ -74,13 +70,14 @@ public class MainActivity extends AppCompatActivity {
             createListView(null);
 
         // enable multiple selection on list view
-        listOfNotes.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        noteListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         // set the listener for entering CAM (contextual action mode)
         // user long presses they can select multiple items
-        listOfNotes.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+        noteListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            ArrayList<Note> selectedNotes = new ArrayList<>();
             @Override
             public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
-                int numChecked = listOfNotes.getCheckedItemCount();
+                int numChecked = noteListView.getCheckedItemCount();
                 actionMode.setTitle(numChecked + " selected");
             }
 
@@ -101,16 +98,28 @@ public class MainActivity extends AppCompatActivity {
                 switch(menuItem.getItemId()){
                     case R.id.deleteMenuItem:
                         // Calls getSelectedIds method from ListViewAdapter Class
-                        SparseBooleanArray selected = listOfNotes.getCheckedItemPositions();
+                        SparseBooleanArray selected = noteListView.getCheckedItemPositions();
+                        ArrayList<Note> allNotes = new ArrayList<>(openHelper.getSelectAllNotesList());
+                        Cursor cursor = openHelper.getSelectAllNotesCursor();
                         // Captures all selected ids with a loop
-                        for (int i = (selected.size() - 1); i >= 0; i--) {
-                            if (selected.valueAt(i)) {
-                                //Note selecteditem = selected.
+                        int k = 0;
+                        for (int j = 0; j <= allNotes.size(); j++) {
+                            Log.d(TAG, "valueOfI " + j);
+                            if (j == selected.keyAt(k)) {
+                                Log.d(TAG, "selectedNote: " + selected.keyAt(j));
+                                Note selecteditem = (Note) allNotes.get(j);
+                                Log.d(TAG, "valueOfSelectedArray: " + selected.toString());
+                                Log.d(TAG, "beforeAddingNote: " + selecteditem.getTitle());
                                 // Remove selected items following the ids
-                                //openHelper.delete(selecteditem.getId());
+                                selectedNotes.add(selecteditem);
+                                Log.d(TAG, "afterAddingNote: " + selecteditem.getTitle());
+                                k++;
                             }
                         }
-                        Cursor cursor = openHelper.getSelectAllNotesCursor();
+                        for (int i = 0; i < selectedNotes.size(); i++){
+                            openHelper.delete(selectedNotes.get(i).getId());
+                        }
+                        cursor = openHelper.getSelectAllNotesCursor();
                         cursorAdapter.swapCursor(cursor);
                         actionMode.finish();
                         return true;
@@ -155,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
      *   Parameters: savedInstanceState
      */
     public void createListView(Note newNote){
-        listOfNotes = new ListView(this);
+        noteListView = new ListView(this);
         GridLayout.Spec rowSpec = GridLayout.spec(1, 1, 1);
         // row start index, row span, row weight
         GridLayout.Spec colSpec = GridLayout.spec(0, 1, 1);
@@ -163,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
         layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
 
-        listOfNotes.setLayoutParams(layoutParams);
+        noteListView.setLayoutParams(layoutParams);
         NoteOpenHelper openHelper = new NoteOpenHelper(this);
 
         Cursor cursor = openHelper.getSelectAllNotesCursor();
@@ -177,48 +186,11 @@ public class MainActivity extends AppCompatActivity {
                 new int[] {android.R.id.text1, android.R.id.icon},
                 0 // leave default
         );
-        /*
-        listOfNotes.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, int i, long l) {
-                final String selection = adapterView.getItemAtPosition(i).toString();
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(MainActivity.this);
-                final int position = i;
-                alertBuilder.setTitle("Delete Note")
-                        .setMessage("Are you sure you want to delete your " + selection + " note?")
-                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                myNotes.remove(position);
-                                cursorAdapter.notifyDataSetChanged();
-                            }
-                        })
-                        .setNegativeButton("No", null)
-                        .setNeutralButton("Share Note", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Note selectedNote = (Note) adapterView.getItemAtPosition(position);
-                                String shareBody = selectedNote.getContent();
-                                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
-                                sharingIntent.setType("text/plain");
-                                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, selectedNote.getTitle());
-                                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody);
-                                startActivity(Intent.createChooser(sharingIntent, "Share content of note using"));
-                            }
-                        });
-                alertBuilder.show();
-                return true; // false if the event was not consumed, true otherwise
-            }
-        });
 
-        if (newNote != null)
-            myNotes.add(newNote);
-        */
+        noteListView.setAdapter(cursorAdapter);
+        layout.addView(noteListView);
 
-        listOfNotes.setAdapter(cursorAdapter);
-        layout.addView(listOfNotes);
-
-        listOfNotes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Note selectedNote = (Note) adapterView.getItemAtPosition(i);
@@ -267,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
             openHelper.insertContact(newNote);
             Cursor cursor = openHelper.getSelectAllNotesCursor();
             cursorAdapter.swapCursor(cursor);
+            noteListView.setAdapter(cursorAdapter);
         }
     }
 }
